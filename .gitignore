@@ -1,0 +1,3 @@
+*.exe
+*.txt
+__pycache__
