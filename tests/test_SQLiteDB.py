@@ -4,20 +4,59 @@ from SQLiteDB import SQLiteDataBase
 @pytest.fixture
 def db():
     db = SQLiteDataBase(':memory:')
+    db.cursor.execute("CREATE TABLE test (id INT, name TEXT)")
     return db
 
-def test_ExecuteSQL(db):
-    # Execute a SQL query
-    db.ExecuteSQL("CREATE TABLE test (id INT, name TEXT)")
+
+def test_ExecuteSQL_without_parameters(db):
+    db.ExecuteSQL("CREATE TABLE testExecuteSQL (id INT, name TEXT)")
     
-    # Fetch the table information
-    db.cursor.execute("PRAGMA table_info(test)")
+    db.cursor.execute("PRAGMA table_info(testExecuteSQL)")
     table_info = db.cursor.fetchall()
     
-    # Assert that the table has the expected columns
     assert len(table_info) == 2
     assert table_info[0][1] == 'id'
     assert table_info[1][1] == 'name'
+
+def test_ExecuteSQL_with_parameters(db):
+    db.ExecuteSQL("INSERT INTO test VALUES (?, ?)", (1, 'test'))
+    
+    db.cursor.execute("SELECT * FROM test")
+    table_info = db.cursor.fetchall()
+    
+    assert len(table_info) == 1
+    assert table_info[0][0] == 1
+    assert table_info[0][1] == 'test'
+
+def test_AddToTable_with_arguments(db):
+    db.AddToTable("test", (1, 'test'))
+    
+    db.cursor.execute("SELECT * FROM test")
+    table_info = db.cursor.fetchall()
+    
+    assert len(table_info) == 1
+    assert table_info[0][0] == 1
+    assert table_info[0][1] == 'test'
+
+def test_AddToTable_without_arguments(db):
+    db.AddToTable("test")
+    
+    db.cursor.execute("SELECT * FROM test")
+    table_info = db.cursor.fetchall()
+    
+    assert len(table_info) == 0
+    with pytest.raises(IndexError):
+        table_info[0][0]
+
+def test_GetTable(db):
+    db.AddToTable("test", (1, 'test'))
+    
+    table_info = db.GetTable("test")
+    
+    assert len(table_info) == 1
+    assert table_info[0][0] == 1
+    assert table_info[0][1] == 'test'
+    
 
 class TestSanitizeName:
     @staticmethod

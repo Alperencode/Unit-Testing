@@ -39,7 +39,7 @@ class SQLiteDataBase:
 
     def AddToTable(self, tableName, parameters=None):
         if not parameters:
-            parameters = ()
+            return
         tableName = SQLiteDataBase.SanitizeName(tableName)
         query = "INSERT INTO {} VALUES ({})".format(
             tableName, ", ".join("?" * len(parameters))
