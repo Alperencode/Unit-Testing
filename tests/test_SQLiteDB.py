@@ -7,11 +7,11 @@ def db():
     db.cursor.execute("CREATE TABLE test (id INT, name TEXT)")
     return db
 
-
-def test_ExecuteSQL_without_parameters(db):
-    db.ExecuteSQL("CREATE TABLE testExecuteSQL (id INT, name TEXT)")
+def test_ExecuteSQL_without_parameters():
+    db = SQLiteDataBase(':memory:')
+    db.ExecuteSQL("CREATE TABLE test (id INT, name TEXT)")
     
-    db.cursor.execute("PRAGMA table_info(testExecuteSQL)")
+    db.cursor.execute("PRAGMA table_info(test)")
     table_info = db.cursor.fetchall()
     
     assert len(table_info) == 2
